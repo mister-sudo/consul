@@ -1,0 +1,93 @@
+---
+
+- name: Create consul group
+  group: name={{ consul_group }} state=present system=yes
+
+- name: Create consul user
+  user: home={{ consul_home }} name={{ consul_user }} group={{ consul_group }} system=yes
+
+- name: Create consul directory
+  file: >
+    state=directory
+    path={{ item }}
+    owner={{ consul_user }}
+    group={{ consul_group }}
+    mode=0755
+  loop:
+    - '{{ consul_home }}/bin'
+    - '{{ consul_data_dir }}'
+    - '{{ consul_config_dir }}'
+
+- name: Install packages required for Consul
+  become: true
+  apt: name='{{item}}' state=latest
+  loop:
+    - unzip
+    - jq
+
+- name: Check archive stat
+  stat: path={{ consul_home }}/{{ consul_archive }}
+  register: consul_archive_stat
+
+- name: Download consul
+  get_url: url={{ consul_download }} dest={{ consul_home }}
+  register: consul_was_downloaded
+  when: consul_archive_stat.stat.exists == False
+
+- name: Check for consul log directory
+  stat: >
+    path={{ consul_log_file|dirname }}
+  register: logdir
+
+- name: Create log directory if it does not exist
+  file: >
+    state=directory
+    path={{ consul_log_file|dirname }}
+    owner={{ consul_user }}
+    group={{ consul_group }}
+  when: not logdir.stat.exists
+
+- name: Touch the log file
+  file: >
+    state=touch
+    path={{ consul_log_file }}
+    owner={{ consul_user }}
+    group={{ consul_group }}
+  changed_when: false
+
+- name: Copy and unpack
+  unarchive: >
+    src={{ consul_home }}/{{ consul_archive }}
+    dest={{ consul_home }}/bin
+    copy=no
+  when: consul_was_downloaded.changed
+
+- name: Set ownership
+  file: >
+    state=directory
+    path={{ consul_home }}
+    owner={{ consul_user }}
+    group={{ consul_group }}
+    recurse=yes
+  when: consul_was_downloaded.changed
+
+- name: Copy consul systemd script
+  template: >
+    src='consul.systemd.j2'
+    dest=/etc/systemd/system/consul.service
+    owner=root
+    group=root
+    mode=0644
+  notify:
+    - Reload systemd
+    - Restart consul
+
+- name: Consul config file
+  template: >
+    src='consul.hcl.j2'
+    dest={{ consul_config_file }}
+    owner={{ consul_user }}
+    group={{ consul_group }}
+    mode=0644
+  notify:
+    - Restart consul

@@ -1,0 +1,6 @@
+---
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Restart consul
+  action: service name=consul state=restarted enabled=yes

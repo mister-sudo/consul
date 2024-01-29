@@ -1,0 +1,17 @@
+datacenter = "{{ consul_datacenter }}"
+
+data_dir = "{{ consul_data_dir }}"
+encrypt = "{{ consul_encrypt_key }}"
+acl_token = "{{ consul_acl_token }}"
+{% if consul_retry_join|length > 0 %}
+retry_join = ["{{ consul_retry_join|join('\",\"') }}"]
+{% endif %}
+server = {{ consul_is_server|bool|ternary('true', 'false') }}
+node_name = "{{ consul_node_name }}"
+enable_syslog = {{ consul_enable_syslog|bool|ternary('true', 'false') }}
+log_level = "{{ consul_log_level }}"
+log_file = "{{ consul_log_file }}"
+ui = {{ consul_enable_ui|bool|ternary('true', 'false') }}
+bind_addr = "{{ consul_bind_address }}"
+client_addr = "{{ consul_client_address }}"
+bootstrap_expect = {{ consul_bootstrap_expect }}

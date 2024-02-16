@@ -91,3 +91,13 @@
     mode=0644
   notify:
     - Restart consul
+
+- name: Consul node-exporter file
+  template: >
+    src='node-exporter.json.j2'
+    dest='/etc/consul.d/node-exporter.json'
+    owner={{ consul_user }}
+    group={{ consul_group }}
+    mode=0644
+  notify:
+    - Restart consul

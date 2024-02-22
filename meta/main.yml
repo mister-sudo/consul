@@ -1,6 +1,6 @@
 galaxy_info:
-  role_name: docker
+  role_name: consul
   author: mister-sudo
-  description: Docker initiation
+  description: Consul cluster & consul agent
   license: BSD
 dependencies: []

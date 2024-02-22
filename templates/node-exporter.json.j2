@@ -1,30 +1,3 @@
-{
-    "services": [
-      {
-        "checks": [
-          {
-            "id": "node-exporter",
-            "interval": "10s",
-            "name": "node-exporter status",
-            "tcp": "127.0.0.1:9100",
-            "timeout": "5s"
-          }
-        ],
-        "meta": [
-          {
-            "application": "core",
-            "component": "monitoring",
-            "localservice": "node_exporter",
-            "metricspath": "/metrics",
-            "role": "worker"
-          }
-        ],
-        "name": "node-exporter",
-        "port": 9100,
-        "tags": [
-          "node-exporter",
-          "production"
-        ]
-      }
-    ]
-  }
+{% if consul_node_exporter_config|length > 0 %}
+{{ consul_node_exporter_config }}
+{% endif %}

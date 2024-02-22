@@ -24,3 +24,6 @@ consul_node_name: '{{ ansible_hostname }}'
 consul_bind_address: '{{ ansible_host }}'
 consul_client_address: '0.0.0.0'
 consul_bootstrap_expect: 3
+
+node_exporter: false
+consul_node_exporter_config: []

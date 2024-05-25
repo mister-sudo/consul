@@ -18,12 +18,21 @@
     - '{{ consul_data_dir }}'
     - '{{ consul_config_dir }}'
 
-- name: Install packages required for Consul
+- name: Install packages required for Debian based
   become: true
   apt: name='{{item}}' state=latest
   loop:
     - unzip
     - jq
+  when: ansible_os_family == 'Debian'
+
+- name: Install packages required for RedHat based
+  become: true
+  yum: name='{{item}}' state=latest
+  loop:
+    - unzip
+    - jq
+  when: ansible_os_family == 'RedHat'
 
 - name: Check archive stat
   stat: path={{ consul_home }}/{{ consul_archive }}
